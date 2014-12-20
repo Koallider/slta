@@ -48,4 +48,13 @@ void print_code()
 		i++;
 	}
 }
-/************************** End Code Generator **************************/
+/************************** End Old Code Generator **************************/
+
+/************************** NASM Addition  **************************/
+void gen_data_segment(char* filename)
+{
+    FILE *out = fopen(filename, "w");
+    fprintf(out, "%%include \"io.inc\"\n");
+    fprintf(out, "section .bss\n\nbuf\tresd\t1\n\nsection .text\n");
+    fclose(out);
+}
