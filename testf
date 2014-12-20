@@ -1,0 +1,27 @@
+let
+    float f, j;
+    integer a, k;
+    float res;
+    integer int;
+in
+    f := 2.5;
+    j:= 3.12;
+    a := 125.45;
+    k := 15.2;
+    write f;
+    write j;
+    write a;
+    write k;
+    k := f*j;
+    write k;
+    res := f*j;
+    write res;
+    int := res;
+    write int;
+    
+    f:=1;
+    while f < 10 do f:= f + 0.5; write f; f := f + 1; end;
+    
+    a := 1;
+    while a < 10 do a:= a + 0.5; write a; a := a + 1; end;
+end

@@ -1,0 +1,15 @@
+var
+	integer n,x, y;
+begin
+	n := 10;
+	x:= 0;
+	y := 0;
+	while x < n do
+	    while y < n do
+	        write y;
+	        y := y + 1;
+	    end;
+	    x := x + 1;
+	    y := 0;
+	end;
+end

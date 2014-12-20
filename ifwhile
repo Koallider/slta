@@ -1,0 +1,20 @@
+var
+    integer i, j, k;
+begin
+    i := 0;
+    j := 5;
+    while i < 10 do
+        if i = 1 then
+            write i;
+        else
+           if j = 5 then
+             write j;
+             j := 0;
+           else
+             skip;
+           fi;
+        fi;
+        i := i + 1;
+        end;
+    end;
+end

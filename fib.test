@@ -1,0 +1,17 @@
+var
+    integer prev1, prev2, current, i, last.
+begin
+    prev1 := 1;
+    prev2 := 1;
+    i := 2;
+    read last;
+    write prev1;
+    write prev2;
+    while i < last do
+        current := prev1 + prev2;
+        prev2 := prev1;
+        prev1 := current;
+        write current;
+        i := i + 1;
+    end;
+end

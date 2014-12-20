@@ -1,0 +1,970 @@
+Грамматика
+
+    0 $accept: program $end
+
+    1 $@1: %empty
+
+    2 program: VAR declarations BEGIN_T $@1 commands END
+
+    3 declarations: %empty
+    4             | declarations INTEGER id_seq IDENTIFIER ';'
+    5             | declarations FLOAT id_seq IDENTIFIER ';'
+    6             | declarations error
+
+    7 id_seq: %empty
+    8       | id_seq IDENTIFIER ','
+
+    9 commands: %empty
+   10         | commands command ';'
+   11         | error ';'
+
+   12 command: SKIP
+   13        | READ IDENTIFIER
+   14        | WRITE exp
+   15        | IDENTIFIER ASSGNOP exp
+
+   16 $@2: %empty
+
+   17 $@3: %empty
+
+   18 $@4: %empty
+
+   19 command: IF exp $@2 THEN commands $@3 ELSE $@4 commands FI
+
+   20 $@5: %empty
+
+   21 $@6: %empty
+
+   22 command: WHILE $@5 exp $@6 DO commands END
+
+   23 exp: INT_NUMBER
+   24    | FLOAT_NUMBER
+   25    | IDENTIFIER
+   26    | exp '<' exp
+   27    | exp '=' exp
+   28    | exp '>' exp
+   29    | exp '+' exp
+   30    | exp '-' exp
+   31    | exp '*' exp
+   32    | exp '/' exp
+   33    | exp '^' exp
+   34    | '(' exp ')'
+
+
+Терминальные символы с правилами, в которых они появляются
+
+$end (0) 0
+'(' (40) 34
+')' (41) 34
+'*' (42) 31
+'+' (43) 29
+',' (44) 8
+'-' (45) 30
+'/' (47) 32
+';' (59) 4 5 10 11
+'<' (60) 26
+'=' (61) 27
+'>' (62) 28
+'^' (94) 33
+error (256) 6 11
+INT_NUMBER (258) 23
+FLOAT_NUMBER (259) 24
+IDENTIFIER (260) 4 5 8 13 15 25
+IF (261) 19
+WHILE (262) 22
+SKIP (263) 12
+THEN (264) 19
+ELSE (265) 19
+FI (266) 19
+DO (267) 22
+END (268) 2 22
+INTEGER (269) 4
+FLOAT (270) 5
+READ (271) 13
+WRITE (272) 14
+VAR (273) 2
+BEGIN_T (274) 2
+ASSGNOP (275) 15
+
+
+Нетерминальные символы с правилами, в которых они появляются
+
+$accept (33)
+    налево: 0
+program (34)
+    налево: 2, направо: 0
+$@1 (35)
+    налево: 1, направо: 2
+declarations (36)
+    налево: 3 4 5 6, направо: 2 4 5 6
+id_seq (37)
+    налево: 7 8, направо: 4 5 8
+commands (38)
+    налево: 9 10 11, направо: 2 10 19 22
+command (39)
+    налево: 12 13 14 15 19 22, направо: 10
+$@2 (40)
+    налево: 16, направо: 19
+$@3 (41)
+    налево: 17, направо: 19
+$@4 (42)
+    налево: 18, направо: 19
+$@5 (43)
+    налево: 20, направо: 22
+$@6 (44)
+    налево: 21, направо: 22
+exp (45)
+    налево: 23 24 25 26 27 28 29 30 31 32 33 34, направо:
+    14 15 19 22 26 27 28 29 30 31 32 33 34
+
+
+State 0
+
+    0 $accept: . program $end
+
+    VAR  сдвиг, и переход в состояние 1
+
+    program  переход в состояние 2
+
+
+State 1
+
+    2 program: VAR . declarations BEGIN_T $@1 commands END
+
+    $default  вывод с использованием правила 3 (declarations)
+
+    declarations  переход в состояние 3
+
+
+State 2
+
+    0 $accept: program . $end
+
+    $end  сдвиг, и переход в состояние 4
+
+
+State 3
+
+    2 program: VAR declarations . BEGIN_T $@1 commands END
+    4 declarations: declarations . INTEGER id_seq IDENTIFIER ';'
+    5             | declarations . FLOAT id_seq IDENTIFIER ';'
+    6             | declarations . error
+
+    error    сдвиг, и переход в состояние 5
+    INTEGER  сдвиг, и переход в состояние 6
+    FLOAT    сдвиг, и переход в состояние 7
+    BEGIN_T  сдвиг, и переход в состояние 8
+
+
+State 4
+
+    0 $accept: program $end .
+
+    $default  принять
+
+
+State 5
+
+    6 declarations: declarations error .
+
+    $default  вывод с использованием правила 6 (declarations)
+
+
+State 6
+
+    4 declarations: declarations INTEGER . id_seq IDENTIFIER ';'
+
+    $default  вывод с использованием правила 7 (id_seq)
+
+    id_seq  переход в состояние 9
+
+
+State 7
+
+    5 declarations: declarations FLOAT . id_seq IDENTIFIER ';'
+
+    $default  вывод с использованием правила 7 (id_seq)
+
+    id_seq  переход в состояние 10
+
+
+State 8
+
+    2 program: VAR declarations BEGIN_T . $@1 commands END
+
+    $default  вывод с использованием правила 1 ($@1)
+
+    $@1  переход в состояние 11
+
+
+State 9
+
+    4 declarations: declarations INTEGER id_seq . IDENTIFIER ';'
+    8 id_seq: id_seq . IDENTIFIER ','
+
+    IDENTIFIER  сдвиг, и переход в состояние 12
+
+
+State 10
+
+    5 declarations: declarations FLOAT id_seq . IDENTIFIER ';'
+    8 id_seq: id_seq . IDENTIFIER ','
+
+    IDENTIFIER  сдвиг, и переход в состояние 13
+
+
+State 11
+
+    2 program: VAR declarations BEGIN_T $@1 . commands END
+
+    error  сдвиг, и переход в состояние 14
+
+    IDENTIFIER  вывод с использованием правила 9 (commands)
+    IF          вывод с использованием правила 9 (commands)
+    WHILE       вывод с использованием правила 9 (commands)
+    SKIP        вывод с использованием правила 9 (commands)
+    END         вывод с использованием правила 9 (commands)
+    READ        вывод с использованием правила 9 (commands)
+    WRITE       вывод с использованием правила 9 (commands)
+
+    commands  переход в состояние 15
+
+
+State 12
+
+    4 declarations: declarations INTEGER id_seq IDENTIFIER . ';'
+    8 id_seq: id_seq IDENTIFIER . ','
+
+    ';'  сдвиг, и переход в состояние 16
+    ','  сдвиг, и переход в состояние 17
+
+
+State 13
+
+    5 declarations: declarations FLOAT id_seq IDENTIFIER . ';'
+    8 id_seq: id_seq IDENTIFIER . ','
+
+    ';'  сдвиг, и переход в состояние 18
+    ','  сдвиг, и переход в состояние 17
+
+
+State 14
+
+   11 commands: error . ';'
+
+    ';'  сдвиг, и переход в состояние 19
+
+
+State 15
+
+    2 program: VAR declarations BEGIN_T $@1 commands . END
+   10 commands: commands . command ';'
+
+    IDENTIFIER  сдвиг, и переход в состояние 20
+    IF          сдвиг, и переход в состояние 21
+    WHILE       сдвиг, и переход в состояние 22
+    SKIP        сдвиг, и переход в состояние 23
+    END         сдвиг, и переход в состояние 24
+    READ        сдвиг, и переход в состояние 25
+    WRITE       сдвиг, и переход в состояние 26
+
+    command  переход в состояние 27
+
+
+State 16
+
+    4 declarations: declarations INTEGER id_seq IDENTIFIER ';' .
+
+    $default  вывод с использованием правила 4 (declarations)
+
+
+State 17
+
+    8 id_seq: id_seq IDENTIFIER ',' .
+
+    $default  вывод с использованием правила 8 (id_seq)
+
+
+State 18
+
+    5 declarations: declarations FLOAT id_seq IDENTIFIER ';' .
+
+    $default  вывод с использованием правила 5 (declarations)
+
+
+State 19
+
+   11 commands: error ';' .
+
+    $default  вывод с использованием правила 11 (commands)
+
+
+State 20
+
+   15 command: IDENTIFIER . ASSGNOP exp
+
+    ASSGNOP  сдвиг, и переход в состояние 28
+
+
+State 21
+
+   19 command: IF . exp $@2 THEN commands $@3 ELSE $@4 commands FI
+
+    INT_NUMBER    сдвиг, и переход в состояние 29
+    FLOAT_NUMBER  сдвиг, и переход в состояние 30
+    IDENTIFIER    сдвиг, и переход в состояние 31
+    '('           сдвиг, и переход в состояние 32
+
+    exp  переход в состояние 33
+
+
+State 22
+
+   22 command: WHILE . $@5 exp $@6 DO commands END
+
+    $default  вывод с использованием правила 20 ($@5)
+
+    $@5  переход в состояние 34
+
+
+State 23
+
+   12 command: SKIP .
+
+    $default  вывод с использованием правила 12 (command)
+
+
+State 24
+
+    2 program: VAR declarations BEGIN_T $@1 commands END .
+
+    $default  вывод с использованием правила 2 (program)
+
+
+State 25
+
+   13 command: READ . IDENTIFIER
+
+    IDENTIFIER  сдвиг, и переход в состояние 35
+
+
+State 26
+
+   14 command: WRITE . exp
+
+    INT_NUMBER    сдвиг, и переход в состояние 29
+    FLOAT_NUMBER  сдвиг, и переход в состояние 30
+    IDENTIFIER    сдвиг, и переход в состояние 31
+    '('           сдвиг, и переход в состояние 32
+
+    exp  переход в состояние 36
+
+
+State 27
+
+   10 commands: commands command . ';'
+
+    ';'  сдвиг, и переход в состояние 37
+
+
+State 28
+
+   15 command: IDENTIFIER ASSGNOP . exp
+
+    INT_NUMBER    сдвиг, и переход в состояние 29
+    FLOAT_NUMBER  сдвиг, и переход в состояние 30
+    IDENTIFIER    сдвиг, и переход в состояние 31
+    '('           сдвиг, и переход в состояние 32
+
+    exp  переход в состояние 38
+
+
+State 29
+
+   23 exp: INT_NUMBER .
+
+    $default  вывод с использованием правила 23 (exp)
+
+
+State 30
+
+   24 exp: FLOAT_NUMBER .
+
+    $default  вывод с использованием правила 24 (exp)
+
+
+State 31
+
+   25 exp: IDENTIFIER .
+
+    $default  вывод с использованием правила 25 (exp)
+
+
+State 32
+
+   34 exp: '(' . exp ')'
+
+    INT_NUMBER    сдвиг, и переход в состояние 29
+    FLOAT_NUMBER  сдвиг, и переход в состояние 30
+    IDENTIFIER    сдвиг, и переход в состояние 31
+    '('           сдвиг, и переход в состояние 32
+
+    exp  переход в состояние 39
+
+
+State 33
+
+   19 command: IF exp . $@2 THEN commands $@3 ELSE $@4 commands FI
+   26 exp: exp . '<' exp
+   27    | exp . '=' exp
+   28    | exp . '>' exp
+   29    | exp . '+' exp
+   30    | exp . '-' exp
+   31    | exp . '*' exp
+   32    | exp . '/' exp
+   33    | exp . '^' exp
+
+    '<'  сдвиг, и переход в состояние 40
+    '>'  сдвиг, и переход в состояние 41
+    '='  сдвиг, и переход в состояние 42
+    '-'  сдвиг, и переход в состояние 43
+    '+'  сдвиг, и переход в состояние 44
+    '*'  сдвиг, и переход в состояние 45
+    '/'  сдвиг, и переход в состояние 46
+    '^'  сдвиг, и переход в состояние 47
+
+    $default  вывод с использованием правила 16 ($@2)
+
+    $@2  переход в состояние 48
+
+
+State 34
+
+   22 command: WHILE $@5 . exp $@6 DO commands END
+
+    INT_NUMBER    сдвиг, и переход в состояние 29
+    FLOAT_NUMBER  сдвиг, и переход в состояние 30
+    IDENTIFIER    сдвиг, и переход в состояние 31
+    '('           сдвиг, и переход в состояние 32
+
+    exp  переход в состояние 49
+
+
+State 35
+
+   13 command: READ IDENTIFIER .
+
+    $default  вывод с использованием правила 13 (command)
+
+
+State 36
+
+   14 command: WRITE exp .
+   26 exp: exp . '<' exp
+   27    | exp . '=' exp
+   28    | exp . '>' exp
+   29    | exp . '+' exp
+   30    | exp . '-' exp
+   31    | exp . '*' exp
+   32    | exp . '/' exp
+   33    | exp . '^' exp
+
+    '<'  сдвиг, и переход в состояние 40
+    '>'  сдвиг, и переход в состояние 41
+    '='  сдвиг, и переход в состояние 42
+    '-'  сдвиг, и переход в состояние 43
+    '+'  сдвиг, и переход в состояние 44
+    '*'  сдвиг, и переход в состояние 45
+    '/'  сдвиг, и переход в состояние 46
+    '^'  сдвиг, и переход в состояние 47
+
+    $default  вывод с использованием правила 14 (command)
+
+
+State 37
+
+   10 commands: commands command ';' .
+
+    $default  вывод с использованием правила 10 (commands)
+
+
+State 38
+
+   15 command: IDENTIFIER ASSGNOP exp .
+   26 exp: exp . '<' exp
+   27    | exp . '=' exp
+   28    | exp . '>' exp
+   29    | exp . '+' exp
+   30    | exp . '-' exp
+   31    | exp . '*' exp
+   32    | exp . '/' exp
+   33    | exp . '^' exp
+
+    '<'  сдвиг, и переход в состояние 40
+    '>'  сдвиг, и переход в состояние 41
+    '='  сдвиг, и переход в состояние 42
+    '-'  сдвиг, и переход в состояние 43
+    '+'  сдвиг, и переход в состояние 44
+    '*'  сдвиг, и переход в состояние 45
+    '/'  сдвиг, и переход в состояние 46
+    '^'  сдвиг, и переход в состояние 47
+
+    $default  вывод с использованием правила 15 (command)
+
+
+State 39
+
+   26 exp: exp . '<' exp
+   27    | exp . '=' exp
+   28    | exp . '>' exp
+   29    | exp . '+' exp
+   30    | exp . '-' exp
+   31    | exp . '*' exp
+   32    | exp . '/' exp
+   33    | exp . '^' exp
+   34    | '(' exp . ')'
+
+    '<'  сдвиг, и переход в состояние 40
+    '>'  сдвиг, и переход в состояние 41
+    '='  сдвиг, и переход в состояние 42
+    '-'  сдвиг, и переход в состояние 43
+    '+'  сдвиг, и переход в состояние 44
+    '*'  сдвиг, и переход в состояние 45
+    '/'  сдвиг, и переход в состояние 46
+    '^'  сдвиг, и переход в состояние 47
+    ')'  сдвиг, и переход в состояние 50
+
+
+State 40
+
+   26 exp: exp '<' . exp
+
+    INT_NUMBER    сдвиг, и переход в состояние 29
+    FLOAT_NUMBER  сдвиг, и переход в состояние 30
+    IDENTIFIER    сдвиг, и переход в состояние 31
+    '('           сдвиг, и переход в состояние 32
+
+    exp  переход в состояние 51
+
+
+State 41
+
+   28 exp: exp '>' . exp
+
+    INT_NUMBER    сдвиг, и переход в состояние 29
+    FLOAT_NUMBER  сдвиг, и переход в состояние 30
+    IDENTIFIER    сдвиг, и переход в состояние 31
+    '('           сдвиг, и переход в состояние 32
+
+    exp  переход в состояние 52
+
+
+State 42
+
+   27 exp: exp '=' . exp
+
+    INT_NUMBER    сдвиг, и переход в состояние 29
+    FLOAT_NUMBER  сдвиг, и переход в состояние 30
+    IDENTIFIER    сдвиг, и переход в состояние 31
+    '('           сдвиг, и переход в состояние 32
+
+    exp  переход в состояние 53
+
+
+State 43
+
+   30 exp: exp '-' . exp
+
+    INT_NUMBER    сдвиг, и переход в состояние 29
+    FLOAT_NUMBER  сдвиг, и переход в состояние 30
+    IDENTIFIER    сдвиг, и переход в состояние 31
+    '('           сдвиг, и переход в состояние 32
+
+    exp  переход в состояние 54
+
+
+State 44
+
+   29 exp: exp '+' . exp
+
+    INT_NUMBER    сдвиг, и переход в состояние 29
+    FLOAT_NUMBER  сдвиг, и переход в состояние 30
+    IDENTIFIER    сдвиг, и переход в состояние 31
+    '('           сдвиг, и переход в состояние 32
+
+    exp  переход в состояние 55
+
+
+State 45
+
+   31 exp: exp '*' . exp
+
+    INT_NUMBER    сдвиг, и переход в состояние 29
+    FLOAT_NUMBER  сдвиг, и переход в состояние 30
+    IDENTIFIER    сдвиг, и переход в состояние 31
+    '('           сдвиг, и переход в состояние 32
+
+    exp  переход в состояние 56
+
+
+State 46
+
+   32 exp: exp '/' . exp
+
+    INT_NUMBER    сдвиг, и переход в состояние 29
+    FLOAT_NUMBER  сдвиг, и переход в состояние 30
+    IDENTIFIER    сдвиг, и переход в состояние 31
+    '('           сдвиг, и переход в состояние 32
+
+    exp  переход в состояние 57
+
+
+State 47
+
+   33 exp: exp '^' . exp
+
+    INT_NUMBER    сдвиг, и переход в состояние 29
+    FLOAT_NUMBER  сдвиг, и переход в состояние 30
+    IDENTIFIER    сдвиг, и переход в состояние 31
+    '('           сдвиг, и переход в состояние 32
+
+    exp  переход в состояние 58
+
+
+State 48
+
+   19 command: IF exp $@2 . THEN commands $@3 ELSE $@4 commands FI
+
+    THEN  сдвиг, и переход в состояние 59
+
+
+State 49
+
+   22 command: WHILE $@5 exp . $@6 DO commands END
+   26 exp: exp . '<' exp
+   27    | exp . '=' exp
+   28    | exp . '>' exp
+   29    | exp . '+' exp
+   30    | exp . '-' exp
+   31    | exp . '*' exp
+   32    | exp . '/' exp
+   33    | exp . '^' exp
+
+    '<'  сдвиг, и переход в состояние 40
+    '>'  сдвиг, и переход в состояние 41
+    '='  сдвиг, и переход в состояние 42
+    '-'  сдвиг, и переход в состояние 43
+    '+'  сдвиг, и переход в состояние 44
+    '*'  сдвиг, и переход в состояние 45
+    '/'  сдвиг, и переход в состояние 46
+    '^'  сдвиг, и переход в состояние 47
+
+    $default  вывод с использованием правила 21 ($@6)
+
+    $@6  переход в состояние 60
+
+
+State 50
+
+   34 exp: '(' exp ')' .
+
+    $default  вывод с использованием правила 34 (exp)
+
+
+State 51
+
+   26 exp: exp . '<' exp
+   26    | exp '<' exp .
+   27    | exp . '=' exp
+   28    | exp . '>' exp
+   29    | exp . '+' exp
+   30    | exp . '-' exp
+   31    | exp . '*' exp
+   32    | exp . '/' exp
+   33    | exp . '^' exp
+
+    '<'  сдвиг, и переход в состояние 40
+    '>'  сдвиг, и переход в состояние 41
+    '='  сдвиг, и переход в состояние 42
+    '-'  сдвиг, и переход в состояние 43
+    '+'  сдвиг, и переход в состояние 44
+    '*'  сдвиг, и переход в состояние 45
+    '/'  сдвиг, и переход в состояние 46
+    '^'  сдвиг, и переход в состояние 47
+
+    $default  вывод с использованием правила 26 (exp)
+
+
+State 52
+
+   26 exp: exp . '<' exp
+   27    | exp . '=' exp
+   28    | exp . '>' exp
+   28    | exp '>' exp .
+   29    | exp . '+' exp
+   30    | exp . '-' exp
+   31    | exp . '*' exp
+   32    | exp . '/' exp
+   33    | exp . '^' exp
+
+    '<'  сдвиг, и переход в состояние 40
+    '>'  сдвиг, и переход в состояние 41
+    '='  сдвиг, и переход в состояние 42
+    '-'  сдвиг, и переход в состояние 43
+    '+'  сдвиг, и переход в состояние 44
+    '*'  сдвиг, и переход в состояние 45
+    '/'  сдвиг, и переход в состояние 46
+    '^'  сдвиг, и переход в состояние 47
+
+    $default  вывод с использованием правила 28 (exp)
+
+
+State 53
+
+   26 exp: exp . '<' exp
+   27    | exp . '=' exp
+   27    | exp '=' exp .
+   28    | exp . '>' exp
+   29    | exp . '+' exp
+   30    | exp . '-' exp
+   31    | exp . '*' exp
+   32    | exp . '/' exp
+   33    | exp . '^' exp
+
+    '<'  сдвиг, и переход в состояние 40
+    '>'  сдвиг, и переход в состояние 41
+    '='  сдвиг, и переход в состояние 42
+    '-'  сдвиг, и переход в состояние 43
+    '+'  сдвиг, и переход в состояние 44
+    '*'  сдвиг, и переход в состояние 45
+    '/'  сдвиг, и переход в состояние 46
+    '^'  сдвиг, и переход в состояние 47
+
+    $default  вывод с использованием правила 27 (exp)
+
+
+State 54
+
+   26 exp: exp . '<' exp
+   27    | exp . '=' exp
+   28    | exp . '>' exp
+   29    | exp . '+' exp
+   30    | exp . '-' exp
+   30    | exp '-' exp .
+   31    | exp . '*' exp
+   32    | exp . '/' exp
+   33    | exp . '^' exp
+
+    '*'  сдвиг, и переход в состояние 45
+    '/'  сдвиг, и переход в состояние 46
+    '^'  сдвиг, и переход в состояние 47
+
+    $default  вывод с использованием правила 30 (exp)
+
+
+State 55
+
+   26 exp: exp . '<' exp
+   27    | exp . '=' exp
+   28    | exp . '>' exp
+   29    | exp . '+' exp
+   29    | exp '+' exp .
+   30    | exp . '-' exp
+   31    | exp . '*' exp
+   32    | exp . '/' exp
+   33    | exp . '^' exp
+
+    '*'  сдвиг, и переход в состояние 45
+    '/'  сдвиг, и переход в состояние 46
+    '^'  сдвиг, и переход в состояние 47
+
+    $default  вывод с использованием правила 29 (exp)
+
+
+State 56
+
+   26 exp: exp . '<' exp
+   27    | exp . '=' exp
+   28    | exp . '>' exp
+   29    | exp . '+' exp
+   30    | exp . '-' exp
+   31    | exp . '*' exp
+   31    | exp '*' exp .
+   32    | exp . '/' exp
+   33    | exp . '^' exp
+
+    '^'  сдвиг, и переход в состояние 47
+
+    $default  вывод с использованием правила 31 (exp)
+
+
+State 57
+
+   26 exp: exp . '<' exp
+   27    | exp . '=' exp
+   28    | exp . '>' exp
+   29    | exp . '+' exp
+   30    | exp . '-' exp
+   31    | exp . '*' exp
+   32    | exp . '/' exp
+   32    | exp '/' exp .
+   33    | exp . '^' exp
+
+    '^'  сдвиг, и переход в состояние 47
+
+    $default  вывод с использованием правила 32 (exp)
+
+
+State 58
+
+   26 exp: exp . '<' exp
+   27    | exp . '=' exp
+   28    | exp . '>' exp
+   29    | exp . '+' exp
+   30    | exp . '-' exp
+   31    | exp . '*' exp
+   32    | exp . '/' exp
+   33    | exp . '^' exp
+   33    | exp '^' exp .
+
+    '^'  сдвиг, и переход в состояние 47
+
+    $default  вывод с использованием правила 33 (exp)
+
+
+State 59
+
+   19 command: IF exp $@2 THEN . commands $@3 ELSE $@4 commands FI
+
+    error  сдвиг, и переход в состояние 14
+
+    IDENTIFIER  вывод с использованием правила 9 (commands)
+    IF          вывод с использованием правила 9 (commands)
+    WHILE       вывод с использованием правила 9 (commands)
+    SKIP        вывод с использованием правила 9 (commands)
+    ELSE        вывод с использованием правила 9 (commands)
+    READ        вывод с использованием правила 9 (commands)
+    WRITE       вывод с использованием правила 9 (commands)
+
+    commands  переход в состояние 61
+
+
+State 60
+
+   22 command: WHILE $@5 exp $@6 . DO commands END
+
+    DO  сдвиг, и переход в состояние 62
+
+
+State 61
+
+   10 commands: commands . command ';'
+   19 command: IF exp $@2 THEN commands . $@3 ELSE $@4 commands FI
+
+    IDENTIFIER  сдвиг, и переход в состояние 20
+    IF          сдвиг, и переход в состояние 21
+    WHILE       сдвиг, и переход в состояние 22
+    SKIP        сдвиг, и переход в состояние 23
+    READ        сдвиг, и переход в состояние 25
+    WRITE       сдвиг, и переход в состояние 26
+
+    $default  вывод с использованием правила 17 ($@3)
+
+    command  переход в состояние 27
+    $@3      переход в состояние 63
+
+
+State 62
+
+   22 command: WHILE $@5 exp $@6 DO . commands END
+
+    error  сдвиг, и переход в состояние 14
+
+    IDENTIFIER  вывод с использованием правила 9 (commands)
+    IF          вывод с использованием правила 9 (commands)
+    WHILE       вывод с использованием правила 9 (commands)
+    SKIP        вывод с использованием правила 9 (commands)
+    END         вывод с использованием правила 9 (commands)
+    READ        вывод с использованием правила 9 (commands)
+    WRITE       вывод с использованием правила 9 (commands)
+
+    commands  переход в состояние 64
+
+
+State 63
+
+   19 command: IF exp $@2 THEN commands $@3 . ELSE $@4 commands FI
+
+    ELSE  сдвиг, и переход в состояние 65
+
+
+State 64
+
+   10 commands: commands . command ';'
+   22 command: WHILE $@5 exp $@6 DO commands . END
+
+    IDENTIFIER  сдвиг, и переход в состояние 20
+    IF          сдвиг, и переход в состояние 21
+    WHILE       сдвиг, и переход в состояние 22
+    SKIP        сдвиг, и переход в состояние 23
+    END         сдвиг, и переход в состояние 66
+    READ        сдвиг, и переход в состояние 25
+    WRITE       сдвиг, и переход в состояние 26
+
+    command  переход в состояние 27
+
+
+State 65
+
+   19 command: IF exp $@2 THEN commands $@3 ELSE . $@4 commands FI
+
+    $default  вывод с использованием правила 18 ($@4)
+
+    $@4  переход в состояние 67
+
+
+State 66
+
+   22 command: WHILE $@5 exp $@6 DO commands END .
+
+    $default  вывод с использованием правила 22 (command)
+
+
+State 67
+
+   19 command: IF exp $@2 THEN commands $@3 ELSE $@4 . commands FI
+
+    error  сдвиг, и переход в состояние 14
+
+    IDENTIFIER  вывод с использованием правила 9 (commands)
+    IF          вывод с использованием правила 9 (commands)
+    WHILE       вывод с использованием правила 9 (commands)
+    SKIP        вывод с использованием правила 9 (commands)
+    FI          вывод с использованием правила 9 (commands)
+    READ        вывод с использованием правила 9 (commands)
+    WRITE       вывод с использованием правила 9 (commands)
+
+    commands  переход в состояние 68
+
+
+State 68
+
+   10 commands: commands . command ';'
+   19 command: IF exp $@2 THEN commands $@3 ELSE $@4 commands . FI
+
+    IDENTIFIER  сдвиг, и переход в состояние 20
+    IF          сдвиг, и переход в состояние 21
+    WHILE       сдвиг, и переход в состояние 22
+    SKIP        сдвиг, и переход в состояние 23
+    FI          сдвиг, и переход в состояние 69
+    READ        сдвиг, и переход в состояние 25
+    WRITE       сдвиг, и переход в состояние 26
+
+    command  переход в состояние 27
+
+
+State 69
+
+   19 command: IF exp $@2 THEN commands $@3 ELSE $@4 commands FI .
+
+    $default  вывод с использованием правила 19 (command)
