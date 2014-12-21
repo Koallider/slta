@@ -1,15 +1,9 @@
 var
-	integer n,x, y;
+	integer n,y,x;
 begin
-	n := 10;
-	x:= 0;
-	y := 0;
-	while x < n do
-	    while y < n do
-	        write y;
-	        y := y + 1;
-	    end;
-	    x := x + 1;
-	    y := 0;
-	end;
+	n := 123;
+	y := 555;
+	x := 111;
+	read x;
+	write x;
 end
