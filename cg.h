@@ -55,9 +55,35 @@ void print_code()
 		temp = temp->next;
 	}
 	printf("section .text\n");
-	/*while (i < code_offset) {
-		printf("%3d: %-10s%4d\n",i,op_name[(int) code[i].op], (int)code[i].arg );
+	printf("global	main\n");
+	printf("main:\n");
+	while (i < code_offset) {
+		
+		if(op_name[(int) code[i].op]=="ld_int"){
+			printf("\tmov\teax,\t%d\n",(int)code[i].arg);
+		}else if(op_name[(int) code[i].op]=="ld_float"){
+			printf("\tfld\tqword\t%f\n",code[i].arg);
+		}else if(op_name[(int) code[i].op]=="store_int"){
+			symrec *temp = sym_table;
+			int j=0;
+			while(j<(data_offset-2)-(int)code[i].arg){
+				temp = temp->next;
+				j++;
+			}
+			printf("\tmov\t[%s],\teax\n",temp->name);
+		}else if(op_name[(int) code[i].op]=="store_float"){
+			symrec *temp = sym_table;
+			int j=0;
+			while(j<(data_offset-2)-(int)code[i].arg){
+				temp = temp->next;
+				j++;
+			}
+			//TODO сделать для флоат
+			//printf("\tmov\t[%s],\teax\n",temp->name);
+		}
+		
+		//printf("%3d: %-10s%4d\n",i,op_name[(int) code[i].op], (int)code[i].arg );
 		i++;
-	}*/
+	}
 }
 /************************** End Code Generator **************************/
