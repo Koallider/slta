@@ -44,6 +44,7 @@ Print Code to stdio
 void print_code()
 {
 	int i = 0;
+	char isFirstReg=1;
 	printf("sys_exit\tequ\t1\nsys_write\tequ\t4\nstdout\tequ\t1\nsys_read\tequ\t3\n");
 	printf("global	_start\n");
 	printf("section .data\n");
@@ -118,9 +119,31 @@ void print_code()
 				printf("\tint  0x80\n");
 				printf("\tmov\teax, inputBuffer\n");
 				printf("\tmov\t[%s], eax\n",temp->name);
-		}
-		
-		//printf("%3d: %-10s%4d\n",i,op_name[(int) code[i].op], (int)code[i].arg );
+		}else if(op_name[(int) code[i].op]=="ld_var"){
+			symrec *temp = sym_table;
+			int j=0;
+			while(j<(data_offset-2)-(int)code[i].arg){
+				temp = temp->next;
+				j++;
+			}
+			if(isFirstReg==1){
+				printf("\tmov  eax, [%s]\n",temp->name);
+				isFirstReg = 0;
+			}else{
+				printf("\tmov  ebx, [%s]\n",temp->name);
+				isFirstReg = 1;
+			}
+		}else if(op_name[(int) code[i].op]=="add" || op_name[(int) code[i].op]=="mul" || op_name[(int) code[i].op]=="div" || op_name[(int) code[i].op]=="sub" ){
+			printf("\t%s  eax, ebx\n", op_name[(int) code[i].op]);
+		}else if(op_name[(int) code[i].op]=="store_int"){
+			symrec *temp = sym_table;
+			int j=0;
+			while(j<(data_offset-2)-(int)code[i].arg){
+				temp = temp->next;
+				j++;
+			}
+			printf("\tmov [%s], eax\n",temp->name);
+		}	
 		i++;
 	}
 	printf("\tmov eax, 0x1\n");

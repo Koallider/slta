@@ -13,7 +13,7 @@ enum code_ops { HALT, STORE_INT, STORE_FLOAT, JMP_FALSE, GOTO,
 char *op_name[] = {"halt", "store_int", "store_float", "jmp_false", "goto",
 	"data", "ld_int", "ld_float", "ld_var",
 	"in_int", "out_int", "in_float", "out_float",
-	"lt", "eq", "gt", "add", "sub", "mult", "div", "pwr" };
+	"lt", "eq", "gt", "add", "sub", "mul", "div", "pwr" };
 
 struct arg
 {
