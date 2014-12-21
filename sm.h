@@ -14,6 +14,14 @@ char *op_name[] = {"halt", "store_int", "store_float", "jmp_false", "goto",
 	"data", "ld_int", "ld_float", "ld_var",
 	"in_int", "out_int", "in_float", "out_float",
 	"lt", "eq", "gt", "add", "sub", "mult", "div", "pwr" };
+
+struct arg
+{
+	char* name;
+	float value;
+	char isConst;
+};	
+	
 struct instruction
 {
 	enum code_ops op;
@@ -43,7 +51,7 @@ void fetch_execute_cycle()
 		ir = code[pc++];
 		/* Execute*/
 		switch (ir.op) {
-			case HALT: 
+			/*case HALT: 
 				printf( "halt\n" );
 				break;
 			case READ_INT : printf( "Input integer: " );
@@ -83,7 +91,10 @@ void fetch_execute_cycle()
 				else stack[--top] = 0.0;
 				break;
 			case ADD: 
-				stack[top-1] = stack[top-1] + stack[top];
+				printf("mov	eax,[a]");
+				printf("add	eax,[b]");
+				printf("mov	[c],eax");
+				//stack[top-1] = stack[top-1] + stack[top];
 				top--;
 				break;
 			case SUB:
@@ -104,6 +115,7 @@ void fetch_execute_cycle()
 				break;
 			default: printf( "Internal Error: Memory Dump\n" );
 				break;
+				* */
 		}
 	}
 	while (ir.op != HALT);

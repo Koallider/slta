@@ -4,6 +4,7 @@ Code Generator
 /*-------------------------------------------------------------------------
 Data Segment
 -------------------------------------------------------------------------*/
+struct ListNode* list;
 int data_offset = 0;
 /* Initial offset*/
 int data_location()
@@ -43,9 +44,20 @@ Print Code to stdio
 void print_code()
 {
 	int i = 0;
-	while (i < code_offset) {
+	printf("section .data\n");
+	symrec *temp = sym_table;
+	while(temp!=NULL){
+		if(temp->type == INT_T){
+			printf("\t%s:\tdd\t%d\n", temp->name, 0);
+		}else if(temp->type == FLOAT_T){
+			printf("\t%s:\tdq\t%f\n", temp->name, 0.0);
+		}
+		temp = temp->next;
+	}
+	printf("section .text\n");
+	/*while (i < code_offset) {
 		printf("%3d: %-10s%4d\n",i,op_name[(int) code[i].op], (int)code[i].arg );
 		i++;
-	}
+	}*/
 }
 /************************** End Code Generator **************************/
