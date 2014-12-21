@@ -1921,6 +1921,7 @@ main(int argc, char *argv[])
 	{
 		print_code();
 		gen_data_segment("test_gen.asm");
+		gen_vars_reservation("test_gen.asm");
 		fetch_execute_cycle();
 	}
 	else

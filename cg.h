@@ -51,10 +51,37 @@ void print_code()
 /************************** End Old Code Generator **************************/
 
 /************************** NASM Addition  **************************/
+
+/****************************************************************************
+ * bss segment generation with buffer variable
+ ***************************************************************************/
 void gen_data_segment(char* filename)
 {
-    FILE *out = fopen(filename, "w");
+    FILE* out = fopen(filename, "w");
     fprintf(out, "%%include \"io.inc\"\n");
     fprintf(out, "section .bss\n\nbuf\tresd\t1\n\nsection .text\n");
+    fprintf(out, "section .code\n");
     fclose(out);
+}
+
+
+/**************************************************************************
+ * Add variables to stack, default value is zero, offset like in symbol 
+ * table (symrec)
+ *************************************************************************/
+void gen_vars_reservation(char* filename)
+{
+    int count, i;
+    FILE* out;
+    if(code[0].op == DATA)
+    {
+      count = code[0].arg;
+      out = fopen(filename, "a");
+      for(i = 0; i <= count; i++)
+      {
+	fprintf(out, "push 0\n");
+      }
+      fprintf(out, "mov eax, 0\n");
+      fclose(out);
+    }
 }
