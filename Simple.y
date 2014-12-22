@@ -185,8 +185,6 @@ main(int argc, char *argv[])
 	if(errors == 0)
 	{
 		print_code();
-		gen_data_segment("test_gen.asm");
-		gen_vars_reservation("test_gen.asm");
 		fetch_execute_cycle();
 	}
 	else
