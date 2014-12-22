@@ -79,11 +79,17 @@ void fprint_code(const char* filename)
 
 	fprintf(out, "main:\n");
 	while (i < code_offset) {
-		
+		fprintf(out, ";%3d: %-10s%4d\n",i,op_name[(int) code[i].op], (int)code[i].arg );
 		if(op_name[(int) code[i].op]=="ld_int"){
-			fprintf(out, "\tmov\teax,\t%d\n",(int)code[i].arg);
+		        if(isFirstReg==1){
+				fprintf(out, "\tmov\teax,\t%d\n",(int)code[i].arg);
+				isFirstReg = 0;
+			}else{
+				fprintf(out, "\tmov\tebx,\t%d\n",(int)code[i].arg);
+				isFirstReg = 1;
+			}
 		}else if(op_name[(int) code[i].op]=="ld_float"){
-			fprintf(out, "\tfld\tqword\t%f\n",code[i].arg);
+			fprintf(out, "\tfld\tqword\t%f\n",code[i].arg);		// ?
 		}else if(op_name[(int) code[i].op]=="store_int"){
 			symrec *temp = sym_table;
 			int j=0;
@@ -103,10 +109,15 @@ void fprint_code(const char* filename)
 			//fprintf("\tmov\t[%s],\teax\n",temp->name);
 		}else if(op_name[(int) code[i].op]=="out_float"){
 			symrec *temp = sym_table;
-			int j=0;
-			while(j<(data_offset-2)-(int)code[i].arg){
+			/*while(j<(data_offset-2)-(int)code[i].arg){
 				temp = temp->next;
 				j++;
+			}*/
+			int j = 0;
+			while(j < code[i].arg)
+			{
+			  temp = temp->next;
+			  j++;
 			}
 			//TODO только однозначные выводит
 				/*fprintf(out, "\tmov\tecx,\t[%s]\n",temp->name);
@@ -118,7 +129,7 @@ void fprint_code(const char* filename)
 				fprintf(out, "\tmov  ebx, stdout\n");
 				fprintf(out, "\tmov  edx, 1\n");
 				fprintf(out, "\tint  0x80\n");*/
-			fprintf(out, "PRINT_DEC 4, %s\n", temp->name);		//not 4
+			fprintf(out, "PRINT_DEC 1, %s\nNEWLINE\n", temp->name);		
 		}else if(op_name[(int) code[i].op]=="in_int"){
 			symrec *temp = sym_table;
 			int j=0;
@@ -126,14 +137,14 @@ void fprint_code(const char* filename)
 				temp = temp->next;
 				j++;
 			}
-			//TODO не работает
-				/*fprintf(out, "\tmov  eax, sys_read\n");
-				fprintf(out, "\tmov  ebx, 0\n");
-				fprintf(out, "\tmov  edx, 1\n");
-				fprintf(out, "\tmov  ecx, inputBuffer\n");
-				fprintf(out, "\tint  0x80\n");
-				fprintf(out, "\tmov\teax, inputBuffer\n");
-				fprintf(out, "\tmov\t[%s], eax\n",temp->name);*/
+			fprintf(out, "GET_DEC 4, [%s]\n", temp->name);
+		}else if(op_name[(int) code[i].op]=="in_float"){
+			symrec *temp = sym_table;
+			int j=0;
+			while(j<(data_offset-2)-(int)code[i].arg){
+				temp = temp->next;
+				j++;
+			}
 			fprintf(out, "GET_DEC 4, [%s]\n", temp->name);
 		}else if(op_name[(int) code[i].op]=="out_int"){
 			symrec *temp = sym_table;
@@ -143,7 +154,7 @@ void fprint_code(const char* filename)
 				j++;
 			}
 			
-			fprintf(out, "PRINT_DEC 4, %s\n", temp->name);
+			fprintf(out, "PRINT_DEC 4, %s\nNEWLINE\n", temp->name);
 		}else if(op_name[(int) code[i].op]=="ld_var"){
 			symrec *temp = sym_table;
 			int j=0;
@@ -158,8 +169,10 @@ void fprint_code(const char* filename)
 				fprintf(out, "\tmov  ebx, [%s]\n",temp->name);
 				isFirstReg = 1;
 			}
-		}else if(op_name[(int) code[i].op]=="add" || op_name[(int) code[i].op]=="mul" || op_name[(int) code[i].op]=="div" || op_name[(int) code[i].op]=="sub" ){
+		}else if(op_name[(int) code[i].op]=="add" || op_name[(int) code[i].op]=="sub" ){
 			fprintf(out, "\t%s  eax, ebx\n", op_name[(int) code[i].op]);
+		}else if(op_name[(int) code[i].op]=="mul" || op_name[(int) code[i].op]=="div"){
+			fprintf(out, "\ti%s  eax, ebx\n", op_name[(int) code[i].op]);
 		}else if(op_name[(int) code[i].op]=="store_int"){
 			symrec *temp = sym_table;
 			int j=0;

@@ -1,6 +1,14 @@
 var
-    integer n;
+    integer i, buf;
 begin
-	read n;
-	write n;
+	read i;
+	write i;
+	buf := i + 2;
+	write buf;
+	buf := i - 2;
+	write buf;
+	buf := i * 2;
+	write buf;
+	buf := i / 2;
+	write buf;
 end

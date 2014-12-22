@@ -142,7 +142,8 @@ commands : /*empty*/
 command : SKIP
 	| READ IDENTIFIER 				{ enum types t = get_type($2);  if(t == INT_T) {context_check(READ_INT, $2); 	} 
 	                                                                               else  if(t == FLOAT_T) { context_check(READ_FLOAT, $2);  } 		}
-	| WRITE exp					{ gen_code(WRITE_FLOAT, 0); }
+	| WRITE IDENTIFIER					{ enum types t = get_type($2);  if(t == INT_T) {context_check(WRITE_INT, $2); 	} 
+	                                                                               else  if(t == FLOAT_T) { context_check(WRITE_FLOAT, $2);   } }
 	| IDENTIFIER ASSGNOP exp 		{ enum types t = get_type($1);  if(t == INT_T) {context_check(STORE_INT, $1); 	} 
 	                                                                               else  if(t == FLOAT_T) { context_check(STORE_FLOAT, $1);   }	}
 	
