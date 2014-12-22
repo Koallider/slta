@@ -2,10 +2,11 @@
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <string.h>
+	#include "LinkedList.h"
 	#include "st.h"			// Таблица идентификаторов
 	#include "sm.h"			// Стек
 	#include "cg.h"			// Генератор кода
-	#include "LinkedList.h"
+
 	#define YYDEBUG 1
 	int errors;				// количество ошибок
 	
@@ -69,7 +70,7 @@
 		return identifier->type;
 	}
 	
-	struct ListNode* list;
+
 	
 	void add_name_to_buf(char* name)
 	{
