@@ -62,10 +62,10 @@ void fprint_code(const char* filename)
 	fprintf(out, "extern scanf\n");
 	fprintf(out, "global main\n");
 	fprintf(out, "section .data\n");
-	fprintf(out, "\tinp_int_msg:\tdb\t\"Input integer: %%d\", 0\n");
-	fprintf(out, "\tinp_flt_msg:\tdb\t\"Input float: %%d\", 0\n");
-	fprintf(out, "\tout_int_msg:\tdb\t\"%%d\", 0\n");
-	fprintf(out, "\tout_flt_msg:\tdb\t\"%%f\", 0\n");
+	fprintf(out, "\tinp_int_msg:\tdb\t\"%%d\", 0\n");
+	fprintf(out, "\tinp_flt_msg:\tdb\t\"%%f\", 0\n");
+	fprintf(out, "\tout_int_msg:\tdb\t\"%%d\", 10, 0\n");
+	fprintf(out, "\tout_flt_msg:\tdb\t\"%%f\", 10, 0\n");
 	
 	symrec *temp = sym_table;
 	while(temp!=NULL){
@@ -124,7 +124,7 @@ void fprint_code(const char* filename)
 			  temp = temp->next;
 			  j++;
 			}
-			fprintf(out, "\tpush [%s]\n", temp->name);
+			fprintf(out, "\tpush dword [%s]\n", temp->name);
 			fprintf(out, "\tpush out_flt_msg\n");
 			fprintf(out, "\tcall printf\n");
 			fprintf(out, "\tadd esp, 8\n");		// float's size is not 4
@@ -135,7 +135,7 @@ void fprint_code(const char* filename)
 				temp = temp->next;
 				j++;
 			}
-			fprintf(out, "\tpush [%s]\n", temp->name);
+			fprintf(out, "\tpush %s\n", temp->name);
 			fprintf(out, "\tpush inp_int_msg\n");
 			fprintf(out, "\tcall scanf\n");
 			fprintf(out, "\tadd esp, 8\n");
@@ -146,7 +146,7 @@ void fprint_code(const char* filename)
 				temp = temp->next;
 				j++;
 			}
-			fprintf(out, "\tpush [%s]\n", temp->name);
+			fprintf(out, "\tpush %s\n", temp->name);
 			fprintf(out, "\tpush inp_float_msg\n");
 			fprintf(out, "\tcall scanf\n");
 			fprintf(out, "\tadd esp, 8\n");		// float's size is not 4
@@ -157,7 +157,7 @@ void fprint_code(const char* filename)
 				temp = temp->next;
 				j++;
 			}
-			fprintf(out, "\tpush [%s]\n", temp->name);
+			fprintf(out, "\tpush dword [%s]\n", temp->name);
 			fprintf(out, "\tpush out_int_msg\n");
 			fprintf(out, "\tcall printf\n");
 			fprintf(out, "\tadd esp, 8\n");
