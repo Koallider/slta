@@ -185,7 +185,7 @@ main(int argc, char *argv[])
 	printf("Parse Completed\n");
 	if(errors == 0)
 	{
-		print_code();
+		fprint_code("program.asm");
 		fetch_execute_cycle();
 	}
 	else

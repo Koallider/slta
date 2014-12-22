@@ -68,10 +68,11 @@
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <string.h>
+	#include "LinkedList.h"
 	#include "st.h"			// Таблица идентификаторов
 	#include "sm.h"			// Стек
 	#include "cg.h"			// Генератор кода
-	#include "LinkedList.h"
+
 	#define YYDEBUG 1
 	int errors;				// количество ошибок
 	
@@ -135,7 +136,7 @@
 		return identifier->type;
 	}
 	
-	struct ListNode* list;
+
 	
 	void add_name_to_buf(char* name)
 	{
@@ -163,7 +164,7 @@
 	}
 
 /* Line 371 of yacc.c  */
-#line 167 "Simple.tab.c"
+#line 168 "Simple.tab.c"
 
 # ifndef YY_NULL
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -225,7 +226,7 @@ extern int yydebug;
 typedef union YYSTYPE
 {
 /* Line 387 of yacc.c  */
-#line 101 "Simple.y"
+#line 102 "Simple.y"
 
 	int intval;			// целочисленные значения
 	float floatval;
@@ -234,7 +235,7 @@ typedef union YYSTYPE
 
 
 /* Line 387 of yacc.c  */
-#line 238 "Simple.tab.c"
+#line 239 "Simple.tab.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -262,7 +263,7 @@ int yyparse ();
 /* Copy the second part of user declarations.  */
 
 /* Line 390 of yacc.c  */
-#line 266 "Simple.tab.c"
+#line 267 "Simple.tab.c"
 
 #ifdef short
 # undef short
@@ -564,10 +565,10 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,   125,   125,   123,   129,   130,   131,   132,   134,   135,
-     137,   138,   139,   141,   142,   144,   145,   148,   150,   151,
-     148,   154,   156,   154,   162,   163,   164,   165,   166,   167,
-     168,   169,   170,   171,   172,   173
+       0,   126,   126,   124,   130,   131,   132,   133,   135,   136,
+     138,   139,   140,   142,   143,   145,   146,   149,   151,   152,
+     149,   155,   157,   155,   163,   164,   165,   166,   167,   168,
+     169,   170,   171,   172,   173,   174
 };
 #endif
 
@@ -1513,168 +1514,168 @@ yyreduce:
     {
         case 2:
 /* Line 1792 of yacc.c  */
-#line 125 "Simple.y"
+#line 126 "Simple.y"
     { gen_code(DATA, data_location() - 1 );          					}
     break;
 
   case 3:
 /* Line 1792 of yacc.c  */
-#line 127 "Simple.y"
+#line 128 "Simple.y"
     { gen_code(HALT, 0); YYACCEPT; 					            		}
     break;
 
   case 5:
 /* Line 1792 of yacc.c  */
-#line 130 "Simple.y"
+#line 131 "Simple.y"
     { add_name_to_buf((yyvsp[(4) - (5)].id)); flush_to_table(INT_T); }
     break;
 
   case 6:
 /* Line 1792 of yacc.c  */
-#line 131 "Simple.y"
+#line 132 "Simple.y"
     { add_name_to_buf((yyvsp[(4) - (5)].id)); flush_to_table(FLOAT_T); }
     break;
 
   case 9:
 /* Line 1792 of yacc.c  */
-#line 135 "Simple.y"
+#line 136 "Simple.y"
     { add_name_to_buf((yyvsp[(2) - (3)].id));											}
     break;
 
   case 14:
 /* Line 1792 of yacc.c  */
-#line 142 "Simple.y"
+#line 143 "Simple.y"
     { enum types t = get_type((yyvsp[(2) - (2)].id));  if(t == INT_T) {context_check(READ_INT, (yyvsp[(2) - (2)].id)); 	} 
 	                                                                               else  if(t == FLOAT_T) { context_check(READ_FLOAT, (yyvsp[(2) - (2)].id));  } 		}
     break;
 
   case 15:
 /* Line 1792 of yacc.c  */
-#line 144 "Simple.y"
+#line 145 "Simple.y"
     { gen_code(WRITE_FLOAT, 0); }
     break;
 
   case 16:
 /* Line 1792 of yacc.c  */
-#line 145 "Simple.y"
+#line 146 "Simple.y"
     { enum types t = get_type((yyvsp[(1) - (3)].id));  if(t == INT_T) {context_check(STORE_INT, (yyvsp[(1) - (3)].id)); 	} 
 	                                                                               else  if(t == FLOAT_T) { context_check(STORE_FLOAT, (yyvsp[(1) - (3)].id));   }	}
     break;
 
   case 17:
 /* Line 1792 of yacc.c  */
-#line 148 "Simple.y"
+#line 149 "Simple.y"
     { (yyvsp[(1) - (2)].lbls) = (struct lbs *) newlblrec();
 										(yyvsp[(1) - (2)].lbls)->for_jmp_false = reserve_loc(); 						}
     break;
 
   case 18:
 /* Line 1792 of yacc.c  */
-#line 150 "Simple.y"
+#line 151 "Simple.y"
     { (yyvsp[(1) - (5)].lbls)->for_goto = reserve_loc();							}
     break;
 
   case 19:
 /* Line 1792 of yacc.c  */
-#line 151 "Simple.y"
+#line 152 "Simple.y"
     { back_patch((yyvsp[(1) - (7)].lbls)->for_jmp_false, JMP_FALSE, gen_label() );	         }
     break;
 
   case 20:
 /* Line 1792 of yacc.c  */
-#line 152 "Simple.y"
+#line 153 "Simple.y"
     { back_patch((yyvsp[(1) - (10)].lbls)->for_goto, GOTO, gen_label()); 				          }
     break;
 
   case 21:
 /* Line 1792 of yacc.c  */
-#line 154 "Simple.y"
+#line 155 "Simple.y"
     { (yyvsp[(1) - (1)].lbls) = (struct lbs *) newlblrec();
 										(yyvsp[(1) - (1)].lbls)->for_goto = gen_label(); 							}
     break;
 
   case 22:
 /* Line 1792 of yacc.c  */
-#line 156 "Simple.y"
+#line 157 "Simple.y"
     { (yyvsp[(1) - (3)].lbls)->for_jmp_false = reserve_loc(); 						        }
     break;
 
   case 23:
 /* Line 1792 of yacc.c  */
-#line 159 "Simple.y"
+#line 160 "Simple.y"
     { gen_code(GOTO, (yyvsp[(1) - (7)].lbls)->for_goto);
 										back_patch((yyvsp[(1) - (7)].lbls)->for_jmp_false, JMP_FALSE, gen_label());	}
     break;
 
   case 24:
 /* Line 1792 of yacc.c  */
-#line 162 "Simple.y"
+#line 163 "Simple.y"
     { gen_code(LD_INT, (yyvsp[(1) - (1)].intval)); 									}
     break;
 
   case 25:
 /* Line 1792 of yacc.c  */
-#line 163 "Simple.y"
+#line 164 "Simple.y"
     { gen_code(LD_FLOAT, (yyvsp[(1) - (1)].floatval));                                                                               }
     break;
 
   case 26:
 /* Line 1792 of yacc.c  */
-#line 164 "Simple.y"
+#line 165 "Simple.y"
     { context_check(LD_VAR, (yyvsp[(1) - (1)].id));								}
     break;
 
   case 27:
 /* Line 1792 of yacc.c  */
-#line 165 "Simple.y"
+#line 166 "Simple.y"
     { gen_code(LT, 0);											}
     break;
 
   case 28:
 /* Line 1792 of yacc.c  */
-#line 166 "Simple.y"
+#line 167 "Simple.y"
     { gen_code(EQ, 0);											}
     break;
 
   case 29:
 /* Line 1792 of yacc.c  */
-#line 167 "Simple.y"
+#line 168 "Simple.y"
     { gen_code(GT, 0);											}
     break;
 
   case 30:
 /* Line 1792 of yacc.c  */
-#line 168 "Simple.y"
+#line 169 "Simple.y"
     { gen_code(ADD, 0);										}
     break;
 
   case 31:
 /* Line 1792 of yacc.c  */
-#line 169 "Simple.y"
+#line 170 "Simple.y"
     { gen_code(SUB, 0);										}
     break;
 
   case 32:
 /* Line 1792 of yacc.c  */
-#line 170 "Simple.y"
+#line 171 "Simple.y"
     { gen_code(MULT, 0);										}
     break;
 
   case 33:
 /* Line 1792 of yacc.c  */
-#line 171 "Simple.y"
+#line 172 "Simple.y"
     { gen_code(DIV, 0);											}
     break;
 
   case 34:
 /* Line 1792 of yacc.c  */
-#line 172 "Simple.y"
+#line 173 "Simple.y"
     { gen_code(PWR, 0);										}
     break;
 
 
 /* Line 1792 of yacc.c  */
-#line 1678 "Simple.tab.c"
+#line 1679 "Simple.tab.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1906,7 +1907,7 @@ yyreturn:
 
 
 /* Line 2055 of yacc.c  */
-#line 175 "Simple.y"
+#line 176 "Simple.y"
 
 
 main(int argc, char *argv[])
@@ -1919,7 +1920,7 @@ main(int argc, char *argv[])
 	printf("Parse Completed\n");
 	if(errors == 0)
 	{
-		print_code();
+		fprint_code("program.asm");
 		fetch_execute_cycle();
 	}
 	else
