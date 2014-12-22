@@ -2,19 +2,19 @@
 
     0 $accept: program $end
 
-    1 $@1: %empty
+    1 $@1: /* пусто */
 
     2 program: VAR declarations BEGIN_T $@1 commands END
 
-    3 declarations: %empty
+    3 declarations: /* пусто */
     4             | declarations INTEGER id_seq IDENTIFIER ';'
     5             | declarations FLOAT id_seq IDENTIFIER ';'
     6             | declarations error
 
-    7 id_seq: %empty
+    7 id_seq: /* пусто */
     8       | id_seq IDENTIFIER ','
 
-    9 commands: %empty
+    9 commands: /* пусто */
    10         | commands command ';'
    11         | error ';'
 
@@ -23,17 +23,17 @@
    14        | WRITE exp
    15        | IDENTIFIER ASSGNOP exp
 
-   16 $@2: %empty
+   16 $@2: /* пусто */
 
-   17 $@3: %empty
+   17 $@3: /* пусто */
 
-   18 $@4: %empty
+   18 $@4: /* пусто */
 
    19 command: IF exp $@2 THEN commands $@3 ELSE $@4 commands FI
 
-   20 $@5: %empty
+   20 $@5: /* пусто */
 
-   21 $@6: %empty
+   21 $@6: /* пусто */
 
    22 command: WHILE $@5 exp $@6 DO commands END
 
