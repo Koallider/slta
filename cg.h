@@ -58,10 +58,15 @@ void fprint_code(const char* filename)
 	}
 	i = 0;
 	
-	fprintf(out, "%%include \"io.inc\"\n");
-	fprintf(out, "sys_exit\tequ\t1\nsys_write\tequ\t4\nstdout\tequ\t1\nsys_read\tequ\t3\n");
-	fprintf(out, "global	main\n");
+	fprintf(out, "extern printf\n");
+	fprintf(out, "extern scanf\n");
+	fprintf(out, "global main\n");
 	fprintf(out, "section .data\n");
+	fprintf(out, "\tinp_int_msg:\tdb\t\"Input integer: %%d\", 0\n");
+	fprintf(out, "\tinp_flt_msg:\tdb\t\"Input float: %%d\", 0\n");
+	fprintf(out, "\tout_int_msg:\tdb\t\"%%d\", 0\n");
+	fprintf(out, "\tout_flt_msg:\tdb\t\"%%f\", 0\n");
+	
 	symrec *temp = sym_table;
 	while(temp!=NULL){
 		if(temp->type == INT_T){
@@ -119,17 +124,10 @@ void fprint_code(const char* filename)
 			  temp = temp->next;
 			  j++;
 			}
-			//TODO только однозначные выводит
-				/*fprintf(out, "\tmov\tecx,\t[%s]\n",temp->name);
-			    fprintf(out, "\tadd\tecx,\t0x30\n");
-				fprintf(out, "\tmov  [outputBuffer], ecx\n");
-				fprintf(out, "\tmov  ecx, outputBuffer\n");
-
-				fprintf(out, "\tmov  eax, sys_write\n");
-				fprintf(out, "\tmov  ebx, stdout\n");
-				fprintf(out, "\tmov  edx, 1\n");
-				fprintf(out, "\tint  0x80\n");*/
-			fprintf(out, "PRINT_DEC 1, %s\nNEWLINE\n", temp->name);		
+			fprintf(out, "\tpush [%s]\n", temp->name);
+			fprintf(out, "\tpush out_flt_msg\n");
+			fprintf(out, "\tcall printf\n");
+			fprintf(out, "\tadd esp, 8\n");		// float's size is not 4
 		}else if(op_name[(int) code[i].op]=="in_int"){
 			symrec *temp = sym_table;
 			int j=0;
@@ -137,7 +135,10 @@ void fprint_code(const char* filename)
 				temp = temp->next;
 				j++;
 			}
-			fprintf(out, "GET_DEC 4, [%s]\n", temp->name);
+			fprintf(out, "\tpush [%s]\n", temp->name);
+			fprintf(out, "\tpush inp_int_msg\n");
+			fprintf(out, "\tcall scanf\n");
+			fprintf(out, "\tadd esp, 8\n");
 		}else if(op_name[(int) code[i].op]=="in_float"){
 			symrec *temp = sym_table;
 			int j=0;
@@ -145,7 +146,10 @@ void fprint_code(const char* filename)
 				temp = temp->next;
 				j++;
 			}
-			fprintf(out, "GET_DEC 4, [%s]\n", temp->name);
+			fprintf(out, "\tpush [%s]\n", temp->name);
+			fprintf(out, "\tpush inp_float_msg\n");
+			fprintf(out, "\tcall scanf\n");
+			fprintf(out, "\tadd esp, 8\n");		// float's size is not 4
 		}else if(op_name[(int) code[i].op]=="out_int"){
 			symrec *temp = sym_table;
 			int j=0;
@@ -153,8 +157,10 @@ void fprint_code(const char* filename)
 				temp = temp->next;
 				j++;
 			}
-			
-			fprintf(out, "PRINT_DEC 4, %s\nNEWLINE\n", temp->name);
+			fprintf(out, "\tpush [%s]\n", temp->name);
+			fprintf(out, "\tpush out_int_msg\n");
+			fprintf(out, "\tcall printf\n");
+			fprintf(out, "\tadd esp, 8\n");
 		}else if(op_name[(int) code[i].op]=="ld_var"){
 			symrec *temp = sym_table;
 			int j=0;
@@ -171,8 +177,10 @@ void fprint_code(const char* filename)
 			}
 		}else if(op_name[(int) code[i].op]=="add" || op_name[(int) code[i].op]=="sub" ){
 			fprintf(out, "\t%s  eax, ebx\n", op_name[(int) code[i].op]);
-		}else if(op_name[(int) code[i].op]=="mul" || op_name[(int) code[i].op]=="div"){
+		}else if(op_name[(int) code[i].op]=="mul"){
 			fprintf(out, "\ti%s  eax, ebx\n", op_name[(int) code[i].op]);
+		}else if(op_name[(int) code[i].op]=="div"){
+			fprintf(out, "\txor edx, edx\n\tdiv ebx\n");
 		}else if(op_name[(int) code[i].op]=="store_int"){
 			symrec *temp = sym_table;
 			int j=0;
