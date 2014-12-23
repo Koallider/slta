@@ -1,0 +1,9 @@
+var
+    integer i;
+begin
+    i := 0;
+    while i < 100 do
+	i := i + 1;
+    end;
+    write i;
+end

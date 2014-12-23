@@ -1,3 +1,6 @@
+#include "rbtree.h"
+#include "lgen.h"
+
 /***************************************************************************
 Code Generator
 ***************************************************************************/
@@ -39,12 +42,16 @@ void back_patch( int addr, enum code_ops operation, float arg )
 	code[addr].arg = arg;
 }
 /*-------------------------------------------------------------------------
-Print Code to stdio
+Print Code to file
 -------------------------------------------------------------------------*/
 void fprint_code(const char* filename)
 {
 	int i = 0;
+	char* label_name;	// var to store generated label name for jmp/goto
+	char* prev_op;		// using to determine, which operation (>, < or =) were in while condition, when we finding jmp_false cmd
+	struct rbtree* jmp_list = NULL, *found_node = NULL;	// in jmp_list: key - line, where jmp will be, value - label name
 	FILE* out = fopen(filename, "w");
+	
 	if(out == NULL)
 	{
 	  perror("Cannot open file");
@@ -53,6 +60,12 @@ void fprint_code(const char* filename)
 	
 	for(i = 0; i < code_offset; i++)
 	{
+	    if(op_name[(int) code[i].op]=="goto" || op_name[(int) code[i].op]=="jmp_false")
+	    {
+	      label_name = calloc(15, sizeof(char));
+	      get_next_label_name(label_name);
+	      jmp_list = rbtree_add(jmp_list, (int)code[i].arg, label_name);
+	    }
 	    printf("%3d: %-10s%4d\n",i,op_name[(int) code[i].op], (int)code[i].arg );
 	}
 	i = 0;
@@ -84,10 +97,17 @@ void fprint_code(const char* filename)
 	fprintf(out, "main:\n");
 	while (i < code_offset) {
 		fprintf(out, ";%3d: %-10s%4d\n",i,op_name[(int) code[i].op], (int)code[i].arg );
+		
+		if((found_node = rbtree_lookup(jmp_list, i)) != NULL && i != 0)	// NullNode in tree has key 0, it is forbidden key
+		{								// but zero line is always data,and it is correct
+		  fprintf(out, "%s:\t", found_node->value);
+		}
+		
 		if(op_name[(int) code[i].op]=="ld_int"){
 			fprintf(out, "\tpush\t%d\n",(int)code[i].arg);
 		}else if(op_name[(int) code[i].op]=="ld_float"){
-			fprintf(out, "\tfld\tqword\t%f\n",code[i].arg);		// ?
+			fprintf(out, "\tfld\tqword\t%f\n",code[i].arg);
+			//TODO don't know, may be all right
 		}else if(op_name[(int) code[i].op]=="store_int"){
 			symrec *temp = sym_table;
 			int j=0;
@@ -97,7 +117,7 @@ void fprint_code(const char* filename)
 			}
 			fprintf(out, "\tpop\teax\n");
 			fprintf(out, "\tmov\t[%s],\teax\n",temp->name);
-		}else if(op_name[(int) code[i].op]=="store_float"){
+		}else if(op_name[(int) code[i].op]=="store_float"){		
 			symrec *temp = sym_table;
 			int j=0;
 			while(j<(data_offset-2)-(int)code[i].arg){
@@ -189,6 +209,29 @@ void fprint_code(const char* filename)
 			fprintf(out, "\tpop\teax\n");
 			fprintf(out, "\txor edx, edx\n\tdiv ebx\n");
 			fprintf(out, "\tpush\teax\n");
+		}else if(op_name[(int) code[i].op]=="lt" || op_name[(int) code[i].op]=="eq" || // while loop implementation
+		    op_name[(int) code[i].op]=="gt"){		
+			fprintf(out, "\tpop\tebx\n");
+			fprintf(out, "\tpop\teax\n");
+			fprintf(out, "\tcmp\teax, ebx\n");
+			prev_op = op_name[(int) code[i].op];
+		}else if(op_name[(int) code[i].op] == "jmp_false"){
+			found_node = rbtree_lookup(jmp_list, (int)code[i].arg);
+			if(prev_op == "lt")
+			{
+			  fprintf(out, "\tjae\t%s\n", found_node->value);
+			}
+			else if(prev_op == "eq")
+			{
+			  fprintf(out, "\tjne\t%s\n", found_node->value);
+			}
+			else if(prev_op == "gt")
+			{
+			  fprintf(out, "\tjle\t%s\n", found_node->value);
+			}
+		}else if(op_name[(int) code[i].op] == "goto"){
+			found_node = rbtree_lookup(jmp_list, (int)code[i].arg);
+			fprintf(out, "\tjmp\t%s\n", found_node->value);
 		}
 		i++;
 	}
