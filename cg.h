@@ -87,10 +87,10 @@ void fprint_code(const char* filename)
 		fprintf(out, ";%3d: %-10s%4d\n",i,op_name[(int) code[i].op], (int)code[i].arg );
 		if(op_name[(int) code[i].op]=="ld_int"){
 		        if(isFirstReg==1){
-				fprintf(out, "\tmov\teax,\t%d\n",(int)code[i].arg);
+				fprintf(out, "\tpush\t%d\n",(int)code[i].arg);
 				isFirstReg = 0;
 			}else{
-				fprintf(out, "\tmov\tebx,\t%d\n",(int)code[i].arg);
+				fprintf(out, "\tmov\teax,\t%d\n",(int)code[i].arg);
 				isFirstReg = 1;
 			}
 		}else if(op_name[(int) code[i].op]=="ld_float"){
@@ -102,7 +102,9 @@ void fprint_code(const char* filename)
 				temp = temp->next;
 				j++;
 			}
+			fprintf(out, "\tpop\teax\n");
 			fprintf(out, "\tmov\t[%s],\teax\n",temp->name);
+			isFirstReg = 1;
 		}else if(op_name[(int) code[i].op]=="store_float"){
 			symrec *temp = sym_table;
 			int j=0;
@@ -112,7 +114,8 @@ void fprint_code(const char* filename)
 			}
 			//TODO сделать для флоат
 			//fprintf("\tmov\t[%s],\teax\n",temp->name);
-		}else if(op_name[(int) code[i].op]=="out_float"){
+			isFirstReg = 1;
+		}else if(op_name[(int) code[i].op]=="out_float"){	// does not work
 			symrec *temp = sym_table;
 			/*while(j<(data_offset-2)-(int)code[i].arg){
 				temp = temp->next;
@@ -139,7 +142,7 @@ void fprint_code(const char* filename)
 			fprintf(out, "\tpush inp_int_msg\n");
 			fprintf(out, "\tcall scanf\n");
 			fprintf(out, "\tadd esp, 8\n");
-		}else if(op_name[(int) code[i].op]=="in_float"){
+		}else if(op_name[(int) code[i].op]=="in_float"){	// does not work
 			symrec *temp = sym_table;
 			int j=0;
 			while(j<(data_offset-2)-(int)code[i].arg){
@@ -169,27 +172,36 @@ void fprint_code(const char* filename)
 				j++;
 			}
 			if(isFirstReg==1){
-				fprintf(out, "\tmov  eax, [%s]\n",temp->name);
+				if(temp->type == INT_T)
+				{
+				  fprintf(out, "\tpush dword [%s]\n",temp->name);
+				}
+				else
+				{
+				  fprintf(out, "\tpush dword [%s]\n",temp->name);
+				}
 				isFirstReg = 0;
 			}else{
-				fprintf(out, "\tmov  ebx, [%s]\n",temp->name);
+				fprintf(out, "\tmov  eax, [%s]\n",temp->name);
 				isFirstReg = 1;
 			}
 		}else if(op_name[(int) code[i].op]=="add" || op_name[(int) code[i].op]=="sub" ){
+			fprintf(out, "\tpop\tebx\n");
 			fprintf(out, "\t%s  eax, ebx\n", op_name[(int) code[i].op]);
+			fprintf(out, "\tpush\teax\n");
+			isFirstReg = 0;
 		}else if(op_name[(int) code[i].op]=="mul"){
+			fprintf(out, "\tpop\tebx\n");
 			fprintf(out, "\ti%s  eax, ebx\n", op_name[(int) code[i].op]);
+			fprintf(out, "\tpush\teax\n");
+			isFirstReg = 0;
 		}else if(op_name[(int) code[i].op]=="div"){
+			fprintf(out, "\tmov\tebx,\teax\n");
+			fprintf(out, "\tpop\tebx\n");
 			fprintf(out, "\txor edx, edx\n\tdiv ebx\n");
-		}else if(op_name[(int) code[i].op]=="store_int"){
-			symrec *temp = sym_table;
-			int j=0;
-			while(j<(data_offset-2)-(int)code[i].arg){
-				temp = temp->next;
-				j++;
-			}
-			fprintf(out, "\tmov [%s], eax\n",temp->name);
-		}	
+			fprintf(out, "\tpush\teax\n");
+			isFirstReg = 0;
+		}
 		i++;
 	}
 	fprintf(out, "\tmov eax, 0x1\n");
