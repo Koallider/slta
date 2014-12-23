@@ -44,7 +44,6 @@ Print Code to stdio
 void fprint_code(const char* filename)
 {
 	int i = 0;
-	char isFirstReg=1;
 	FILE* out = fopen(filename, "w");
 	if(out == NULL)
 	{
@@ -63,9 +62,9 @@ void fprint_code(const char* filename)
 	fprintf(out, "global main\n");
 	fprintf(out, "section .data\n");
 	fprintf(out, "\tinp_int_msg:\tdb\t\"%%d\", 0\n");
-	fprintf(out, "\tinp_flt_msg:\tdb\t\"%%f\", 0\n");
+	fprintf(out, "\tinp_flt_msg:\tdb\t\"%%lf\", 0\n");
 	fprintf(out, "\tout_int_msg:\tdb\t\"%%d\", 10, 0\n");
-	fprintf(out, "\tout_flt_msg:\tdb\t\"%%f\", 10, 0\n");
+	fprintf(out, "\tout_flt_msg:\tdb\t\"%%lf\", 10, 0\n");
 	
 	symrec *temp = sym_table;
 	while(temp!=NULL){
@@ -86,13 +85,7 @@ void fprint_code(const char* filename)
 	while (i < code_offset) {
 		fprintf(out, ";%3d: %-10s%4d\n",i,op_name[(int) code[i].op], (int)code[i].arg );
 		if(op_name[(int) code[i].op]=="ld_int"){
-		        if(isFirstReg==1){
-				fprintf(out, "\tpush\t%d\n",(int)code[i].arg);
-				isFirstReg = 0;
-			}else{
-				fprintf(out, "\tmov\teax,\t%d\n",(int)code[i].arg);
-				isFirstReg = 1;
-			}
+			fprintf(out, "\tpush\t%d\n",(int)code[i].arg);
 		}else if(op_name[(int) code[i].op]=="ld_float"){
 			fprintf(out, "\tfld\tqword\t%f\n",code[i].arg);		// ?
 		}else if(op_name[(int) code[i].op]=="store_int"){
@@ -104,7 +97,6 @@ void fprint_code(const char* filename)
 			}
 			fprintf(out, "\tpop\teax\n");
 			fprintf(out, "\tmov\t[%s],\teax\n",temp->name);
-			isFirstReg = 1;
 		}else if(op_name[(int) code[i].op]=="store_float"){
 			symrec *temp = sym_table;
 			int j=0;
@@ -114,23 +106,18 @@ void fprint_code(const char* filename)
 			}
 			//TODO сделать для флоат
 			//fprintf("\tmov\t[%s],\teax\n",temp->name);
-			isFirstReg = 1;
-		}else if(op_name[(int) code[i].op]=="out_float"){	// does not work
+		}else if(op_name[(int) code[i].op]=="out_float"){
+			int j = 0;
 			symrec *temp = sym_table;
-			/*while(j<(data_offset-2)-(int)code[i].arg){
+			while(j<(data_offset-2)-(int)code[i].arg){
 				temp = temp->next;
 				j++;
-			}*/
-			int j = 0;
-			while(j < code[i].arg)
-			{
-			  temp = temp->next;
-			  j++;
 			}
+			fprintf(out, "\tpush dword [%s + 4]\n", temp->name);
 			fprintf(out, "\tpush dword [%s]\n", temp->name);
 			fprintf(out, "\tpush out_flt_msg\n");
 			fprintf(out, "\tcall printf\n");
-			fprintf(out, "\tadd esp, 8\n");		// float's size is not 4
+			fprintf(out, "\tadd esp, 12\n");
 		}else if(op_name[(int) code[i].op]=="in_int"){
 			symrec *temp = sym_table;
 			int j=0;
@@ -149,10 +136,18 @@ void fprint_code(const char* filename)
 				temp = temp->next;
 				j++;
 			}
-			fprintf(out, "\tpush %s\n", temp->name);
-			fprintf(out, "\tpush inp_float_msg\n");
-			fprintf(out, "\tcall scanf\n");
-			fprintf(out, "\tadd esp, 8\n");		// float's size is not 4
+			fprintf(out, "\tpush\tebp\n");
+			fprintf(out, "\tmov\tebp, esp\n");
+			fprintf(out, "\tsub\tesp, 8\n");
+			fprintf(out, "\tlea\teax, [ebp-8]\n");
+			fprintf(out, "\tpush\teax\n");
+			fprintf(out, "\tpush\tinp_flt_msg\n");
+			fprintf(out, "\tcall\tscanf\n");
+			fprintf(out, "\tadd\tesp, 8\n");
+			fprintf(out, "\tfld\tqword [ebp-8]\n");
+			fprintf(out, "\tfstp\tqword [%s]\n", temp->name);
+			fprintf(out, "\tmov\tesp, ebp\n");
+			fprintf(out, "\tpop\tebp\n");
 		}else if(op_name[(int) code[i].op]=="out_int"){
 			symrec *temp = sym_table;
 			int j=0;
@@ -171,36 +166,29 @@ void fprint_code(const char* filename)
 				temp = temp->next;
 				j++;
 			}
-			if(isFirstReg==1){
-				if(temp->type == INT_T)
-				{
-				  fprintf(out, "\tpush dword [%s]\n",temp->name);
-				}
-				else
-				{
-				  fprintf(out, "\tpush dword [%s]\n",temp->name);
-				}
-				isFirstReg = 0;
-			}else{
-				fprintf(out, "\tmov  eax, [%s]\n",temp->name);
-				isFirstReg = 1;
+			if(temp->type == INT_T)
+			{
+			  fprintf(out, "\tpush dword [%s]\n",temp->name);
+			}
+			else
+			{
+			  fprintf(out, "\tpush dword [%s]\n",temp->name);
 			}
 		}else if(op_name[(int) code[i].op]=="add" || op_name[(int) code[i].op]=="sub" ){
 			fprintf(out, "\tpop\tebx\n");
+			fprintf(out, "\tpop\teax\n");
 			fprintf(out, "\t%s  eax, ebx\n", op_name[(int) code[i].op]);
 			fprintf(out, "\tpush\teax\n");
-			isFirstReg = 0;
 		}else if(op_name[(int) code[i].op]=="mul"){
 			fprintf(out, "\tpop\tebx\n");
+			fprintf(out, "\tpop\teax\n");
 			fprintf(out, "\ti%s  eax, ebx\n", op_name[(int) code[i].op]);
 			fprintf(out, "\tpush\teax\n");
-			isFirstReg = 0;
 		}else if(op_name[(int) code[i].op]=="div"){
-			fprintf(out, "\tmov\tebx,\teax\n");
 			fprintf(out, "\tpop\tebx\n");
+			fprintf(out, "\tpop\teax\n");
 			fprintf(out, "\txor edx, edx\n\tdiv ebx\n");
 			fprintf(out, "\tpush\teax\n");
-			isFirstReg = 0;
 		}
 		i++;
 	}
