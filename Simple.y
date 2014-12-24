@@ -187,7 +187,6 @@ main(int argc, char *argv[])
 	if(errors == 0)
 	{
 		fprint_code("program.asm");
-		fetch_execute_cycle();
 	}
 	else
 	{

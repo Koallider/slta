@@ -1,9 +1,13 @@
 var
-    integer i;
+    integer i, j, k;
 begin
     i := 0;
+    j := 0;
     while i < 100 do
+	write k;
 	i := i + 1;
+	j := j + 1;
+	write i;
+	write j;
     end;
-    write i;
 end
