@@ -1,4 +1,5 @@
 #include "rbtree.h"
+#include "rbtree_fl.h"
 #include "lgen.h"
 
 /***************************************************************************
@@ -50,6 +51,8 @@ void fprint_code(const char* filename)
 	char* label_name;	// var to store generated label name for jmp/goto
 	char* prev_op;		// using to determine, which operation (>, < or =) were in while condition, when we finding jmp_false cmd
 	struct rbtree* jmp_list = NULL, *found_node = NULL;	// in jmp_list: key - line, where jmp will be, value - label name
+	struct rbtree_fl* const_float_list = NULL, *found_float_const = NULL;
+	struct rbtree* const_int_list = NULL, *found_int_const = NULL;
 	FILE* out = fopen(filename, "w");
 	
 	if(out == NULL)
@@ -68,7 +71,6 @@ void fprint_code(const char* filename)
 	    }
 	    printf("%3d: %-10s%4d\n",i,op_name[(int) code[i].op], (int)code[i].arg );
 	}
-	i = 0;
 	
 	fprintf(out, "extern printf\n");
 	fprintf(out, "extern scanf\n");
@@ -89,9 +91,33 @@ void fprint_code(const char* filename)
 		temp = temp->next;
 	}
 	
+	for(i = 0; i < code_offset; i++)
+	{
+	    if(op_name[(int) code[i].op]=="ld_int")
+	    {
+	      if((found_int_const = rbtree_lookup(const_int_list, (int)code[i].arg)) == NULL)
+	      {
+		label_name = calloc(15, sizeof(char));
+		get_next_label_name(label_name);
+		const_int_list = rbtree_add(const_int_list, (int)code[i].arg, label_name);
+		fprintf(out, "\t%s:\tdd\t%d\n", label_name, (int)code[i].arg);
+	      }
+	    }
+	    else if(op_name[(int) code[i].op]=="ld_float")
+	    {
+	      if((found_float_const = rbtree_lookup_fl(const_float_list, code[i].arg)) == NULL)
+	      {
+		label_name = calloc(15, sizeof(char));
+		get_next_label_name(label_name);
+		const_float_list = rbtree_add_fl(const_float_list, code[i].arg, label_name);
+		fprintf(out, "\t%s:\tdq\t%f\n", label_name, code[i].arg);
+	      }
+	    }
+	}
+	i = 0;
+	
 	fprintf(out, "section .bss\n");
-	fprintf(out, "\toutputBuffer\tresb\t4\n");
-	fprintf(out, "\tinputBuffer\tresb\t4\n");
+	fprintf(out, "\tbuf\tresq\t1\n");
 	fprintf(out, "section .text\n");
 
 	fprintf(out, "main:\n");
@@ -104,10 +130,11 @@ void fprint_code(const char* filename)
 		}
 		
 		if(op_name[(int) code[i].op]=="ld_int"){
-			fprintf(out, "\tpush\t%d\n",(int)code[i].arg);
+			found_int_const = rbtree_lookup(const_int_list, (int)code[i].arg);
+			fprintf(out, "\tfild\tdword [%s]\n",found_int_const->value);
 		}else if(op_name[(int) code[i].op]=="ld_float"){
-			fprintf(out, "\tfld\tqword\t%f\n",code[i].arg);
-			//TODO don't know, may be all right
+			found_float_const = rbtree_lookup_fl(const_float_list, code[i].arg);
+			fprintf(out, "\tfld\tqword [%s]\n",found_float_const->value);
 		}else if(op_name[(int) code[i].op]=="store_int"){
 			symrec *temp = sym_table;
 			int j=0;
@@ -115,8 +142,7 @@ void fprint_code(const char* filename)
 				temp = temp->next;
 				j++;
 			}
-			fprintf(out, "\tpop\teax\n");
-			fprintf(out, "\tmov\t[%s],\teax\n",temp->name);
+			fprintf(out, "\tfistp\tdword [%s]\n",temp->name);
 		}else if(op_name[(int) code[i].op]=="store_float"){		
 			symrec *temp = sym_table;
 			int j=0;
@@ -124,8 +150,7 @@ void fprint_code(const char* filename)
 				temp = temp->next;
 				j++;
 			}
-			//TODO сделать для флоат
-			//fprintf("\tmov\t[%s],\teax\n",temp->name);
+			fprintf(out, "\tfstp\tqword [%s]\n",temp->name);
 		}else if(op_name[(int) code[i].op]=="out_float"){
 			int j = 0;
 			symrec *temp = sym_table;
@@ -188,32 +213,32 @@ void fprint_code(const char* filename)
 			}
 			if(temp->type == INT_T)
 			{
-			  fprintf(out, "\tpush dword [%s]\n",temp->name);
+			  fprintf(out, "\tfild\tdword [%s]\n",temp->name);
 			}
 			else
 			{
-			  fprintf(out, "\tpush dword [%s]\n",temp->name);
+			  fprintf(out, "\tfld\tqword [%s]\n",temp->name);
 			}
-		}else if(op_name[(int) code[i].op]=="add" || op_name[(int) code[i].op]=="sub" ){
-			fprintf(out, "\tpop\tebx\n");
-			fprintf(out, "\tpop\teax\n");
-			fprintf(out, "\t%s  eax, ebx\n", op_name[(int) code[i].op]);
-			fprintf(out, "\tpush\teax\n");
+		}else if(op_name[(int) code[i].op]=="add") {
+			fprintf(out, "\tfstp\tqword [buf]\n");
+			fprintf(out, "\tfadd\tqword [buf]\n");
+		}else if(op_name[(int) code[i].op]=="sub"){
+			fprintf(out, "\tfstp\tqword [buf]\n");
+			fprintf(out, "\tfsub\tqword [buf]\n");
 		}else if(op_name[(int) code[i].op]=="mul"){
-			fprintf(out, "\tpop\tebx\n");
-			fprintf(out, "\tpop\teax\n");
-			fprintf(out, "\ti%s  eax, ebx\n", op_name[(int) code[i].op]);
-			fprintf(out, "\tpush\teax\n");
+			fprintf(out, "\tfstp\tqword [buf]\n");
+			fprintf(out, "\tfmul\tqword [buf]\n");
 		}else if(op_name[(int) code[i].op]=="div"){
-			fprintf(out, "\tpop\tebx\n");
-			fprintf(out, "\tpop\teax\n");
-			fprintf(out, "\txor edx, edx\n\tdiv ebx\n");
-			fprintf(out, "\tpush\teax\n");
+			fprintf(out, "\tfstp\tqword [buf]\n");
+			fprintf(out, "\tfdiv\tqword [buf]\n");
 		}else if(op_name[(int) code[i].op]=="lt" || op_name[(int) code[i].op]=="eq" || // while loop implementation
-		    op_name[(int) code[i].op]=="gt"){		
-			fprintf(out, "\tpop\tebx\n");
-			fprintf(out, "\tpop\teax\n");
-			fprintf(out, "\tcmp\teax, ebx\n");
+		    op_name[(int) code[i].op]=="gt"){
+			fprintf(out, "\tfstp\tqword [buf]\n");
+			fprintf(out, "\tfcomp\tqword [buf]\n");
+			fprintf(out, "\tfstp\tqword [buf]\n");
+			fprintf(out, "\twait\n");
+			fprintf(out, "\tfstsw\tax\n");
+			fprintf(out, "\tsahf\n");
 			prev_op = op_name[(int) code[i].op];
 		}else if(op_name[(int) code[i].op] == "jmp_false"){
 			found_node = rbtree_lookup(jmp_list, (int)code[i].arg);
@@ -227,7 +252,7 @@ void fprint_code(const char* filename)
 			}
 			else if(prev_op == "gt")
 			{
-			  fprintf(out, "\tjle\t%s\n", found_node->value);
+			  fprintf(out, "\tjbe\t%s\n", found_node->value);
 			}
 		}else if(op_name[(int) code[i].op] == "goto"){
 			found_node = rbtree_lookup(jmp_list, (int)code[i].arg);

@@ -27,7 +27,7 @@ struct rbtree
     struct rbtree *right;
 };
 
-struct rbtree EmptyNode = {0, 0, COLOR_BLACK,
+struct rbtree EmptyNode = {-1, 0, COLOR_BLACK,
     NULL, NULL, NULL};
 struct rbtree *NullNode = &EmptyNode;
 
