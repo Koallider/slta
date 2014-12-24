@@ -1,5 +1,5 @@
 var
-    integer prev1, prev2, current, i, last.
+    integer prev1, prev2, current, i, last;
 begin
     prev1 := 1;
     prev2 := 1;
