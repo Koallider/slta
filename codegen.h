@@ -122,8 +122,6 @@ void fprint_code(const char* filename)
 
 	fprintf(out, "main:\n");
 	while (i < code_offset) {
-		fprintf(out, ";%3d: %-10s%4d\n",i,op_name[(int) code[i].op], (int)code[i].arg );
-		
 		if((found_node = rbtree_lookup(jmp_list, i)) != NULL && i != 0)	// NullNode in tree has key 0, it is forbidden key
 		{								// but zero line is always data,and it is correct
 		  fprintf(out, "%s:\t", found_node->value);

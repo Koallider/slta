@@ -2,10 +2,11 @@
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <string.h>
+	#include <unistd.h>
 	#include "LinkedList.h"
-	#include "st.h"			// Таблица идентификаторов
-	#include "sm.h"			// Стек
-	#include "cg.h"			// Генератор кода
+	#include "stable.h"			// Таблица идентификаторов
+	#include "internal.h"			// Стек
+	#include "codegen.h"			// Генератор кода
 
 	#define YYDEBUG 1
 	int errors;				// количество ошибок
@@ -179,14 +180,23 @@ exp :  INT_NUMBER				{ gen_code(LD_INT, $1); 									}
 main(int argc, char *argv[])
 {
 	extern FILE *yyin;
+	char* filename = "program.asm";
+	int opt = 0;
 	++argv; --argc;
 	yyin = fopen(argv[0], "r");
+	while((opt = getopt(argc, argv, "o:")) != -1)
+	{
+	    if(opt == 'o')
+	    {
+		filename = optarg;
+	    }
+	}
 	errors = 0;
 	yyparse();
 	printf("Parse Completed\n");
 	if(errors == 0)
 	{
-		fprint_code("program.asm");
+		fprint_code(filename);
 	}
 	else
 	{

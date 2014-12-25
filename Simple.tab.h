@@ -72,7 +72,7 @@ extern int yydebug;
 typedef union YYSTYPE
 {
 /* Line 2058 of yacc.c  */
-#line 102 "Simple.y"
+#line 103 "Simple.y"
 
 	int intval;			// целочисленные значения
 	float floatval;
