@@ -2,38 +2,38 @@
 
     0 $accept: program $end
 
-    1 $@1: %empty
+    1 $@1: /* пусто */
 
     2 program: VAR declarations BEGIN_T $@1 commands END
 
-    3 declarations: %empty
+    3 declarations: /* пусто */
     4             | declarations INTEGER id_seq IDENTIFIER ';'
     5             | declarations FLOAT id_seq IDENTIFIER ';'
     6             | declarations error
 
-    7 id_seq: %empty
+    7 id_seq: /* пусто */
     8       | id_seq IDENTIFIER ','
 
-    9 commands: %empty
+    9 commands: /* пусто */
    10         | commands command ';'
    11         | error ';'
 
    12 command: SKIP
    13        | READ IDENTIFIER
-   14        | WRITE exp
+   14        | WRITE IDENTIFIER
    15        | IDENTIFIER ASSGNOP exp
 
-   16 $@2: %empty
+   16 $@2: /* пусто */
 
-   17 $@3: %empty
+   17 $@3: /* пусто */
 
-   18 $@4: %empty
+   18 $@4: /* пусто */
 
    19 command: IF exp $@2 THEN commands $@3 ELSE $@4 commands FI
 
-   20 $@5: %empty
+   20 $@5: /* пусто */
 
-   21 $@6: %empty
+   21 $@6: /* пусто */
 
    22 command: WHILE $@5 exp $@6 DO commands END
 
@@ -69,7 +69,7 @@ $end (0) 0
 error (256) 6 11
 INT_NUMBER (258) 23
 FLOAT_NUMBER (259) 24
-IDENTIFIER (260) 4 5 8 13 15 25
+IDENTIFIER (260) 4 5 8 13 14 15 25
 IF (261) 19
 WHILE (262) 22
 SKIP (263) 12
@@ -115,7 +115,7 @@ $@6 (44)
     налево: 21, направо: 22
 exp (45)
     налево: 23 24 25 26 27 28 29 30 31 32 33 34, направо:
-    14 15 19 22 26 27 28 29 30 31 32 33 34
+    15 19 22 26 27 28 29 30 31 32 33 34
 
 
 State 0
@@ -350,14 +350,9 @@ State 25
 
 State 26
 
-   14 command: WRITE . exp
+   14 command: WRITE . IDENTIFIER
 
-    INT_NUMBER    сдвиг, и переход в состояние 29
-    FLOAT_NUMBER  сдвиг, и переход в состояние 30
-    IDENTIFIER    сдвиг, и переход в состояние 31
-    '('           сдвиг, и переход в состояние 32
-
-    exp  переход в состояние 36
+    IDENTIFIER  сдвиг, и переход в состояние 36
 
 
 State 27
@@ -459,24 +454,7 @@ State 35
 
 State 36
 
-   14 command: WRITE exp .
-   26 exp: exp . '<' exp
-   27    | exp . '=' exp
-   28    | exp . '>' exp
-   29    | exp . '+' exp
-   30    | exp . '-' exp
-   31    | exp . '*' exp
-   32    | exp . '/' exp
-   33    | exp . '^' exp
-
-    '<'  сдвиг, и переход в состояние 40
-    '>'  сдвиг, и переход в состояние 41
-    '='  сдвиг, и переход в состояние 42
-    '-'  сдвиг, и переход в состояние 43
-    '+'  сдвиг, и переход в состояние 44
-    '*'  сдвиг, и переход в состояние 45
-    '/'  сдвиг, и переход в состояние 46
-    '^'  сдвиг, и переход в состояние 47
+   14 command: WRITE IDENTIFIER .
 
     $default  вывод с использованием правила 14 (command)
 

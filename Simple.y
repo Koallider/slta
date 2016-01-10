@@ -2,10 +2,12 @@
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <string.h>
-	#include "st.h"			// Таблица идентификаторов
-	#include "sm.h"			// Стек
-	#include "cg.h"			// Генератор кода
+	#include <unistd.h>
 	#include "LinkedList.h"
+	#include "stable.h"			// Таблица идентификаторов
+	#include "internal.h"			// Стек
+	#include "codegen.h"			// Генератор кода
+
 	#define YYDEBUG 1
 	int errors;				// количество ошибок
 	
@@ -69,7 +71,7 @@
 		return identifier->type;
 	}
 	
-	struct ListNode* list;
+
 	
 	void add_name_to_buf(char* name)
 	{
@@ -141,7 +143,8 @@ commands : /*empty*/
 command : SKIP
 	| READ IDENTIFIER 				{ enum types t = get_type($2);  if(t == INT_T) {context_check(READ_INT, $2); 	} 
 	                                                                               else  if(t == FLOAT_T) { context_check(READ_FLOAT, $2);  } 		}
-	| WRITE exp					{ gen_code(WRITE_FLOAT, 0); }
+	| WRITE IDENTIFIER					{ enum types t = get_type($2);  if(t == INT_T) {context_check(WRITE_INT, $2); 	} 
+	                                                                               else  if(t == FLOAT_T) { context_check(WRITE_FLOAT, $2);   } }
 	| IDENTIFIER ASSGNOP exp 		{ enum types t = get_type($1);  if(t == INT_T) {context_check(STORE_INT, $1); 	} 
 	                                                                               else  if(t == FLOAT_T) { context_check(STORE_FLOAT, $1);   }	}
 	
@@ -177,15 +180,23 @@ exp :  INT_NUMBER				{ gen_code(LD_INT, $1); 									}
 main(int argc, char *argv[])
 {
 	extern FILE *yyin;
+	char* filename = "program.asm";
+	int opt = 0;
 	++argv; --argc;
 	yyin = fopen(argv[0], "r");
+	while((opt = getopt(argc, argv, "o:")) != -1)
+	{
+	    if(opt == 'o')
+	    {
+		filename = optarg;
+	    }
+	}
 	errors = 0;
 	yyparse();
 	printf("Parse Completed\n");
 	if(errors == 0)
 	{
-		print_code();
-		fetch_execute_cycle();
+		fprint_code(filename);
 	}
 	else
 	{
