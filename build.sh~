@@ -1,5 +1,0 @@
-bison -dv -W ./src/Simple.y -o ./target/Simple.tab.c
-gcc -c ./target/Simple.tab.c
-flex ./src/Simple.lex --outfile=./target/lex.yy.c
-gcc -c ./target/lex.yy.c
-gcc -o ./target/Simple ./target/Simple.tab.o ./target/lex.yy.o -lm
