@@ -1,7 +1,0 @@
-var
-	integer n,i,x;
-begin
-    read x;
-	write n;
-	write x;
-end

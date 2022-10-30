@@ -1,9 +1,0 @@
-var
-	integer n,y,x;
-begin
-	n := 123;
-	y := 555;
-	x := 111;
-	read x;
-	write x;
-end

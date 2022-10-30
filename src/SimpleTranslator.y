@@ -4,7 +4,7 @@
 	#include <string.h>
 	#include <unistd.h>
 	#include "LinkedList.h"
-	#include "stable.h"			// Таблица идентификаторов
+#include "stable.h"			// Таблица идентификаторов
 	#include "internal.h"			// Стек
 	#include "codegen.h"			// Генератор кода
 
@@ -188,7 +188,7 @@ main(int argc, char *argv[])
 	{
 	    if(opt == 'o')
 	    {
-		filename = optarg;
+		    filename = optarg;
 	    }
 	}
 	errors = 0;

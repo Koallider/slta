@@ -1,8 +1,9 @@
 %option yylineno
 %{
 	#include <string.h>
-	#include "Simple.tab.h"
-	int snum;
+	#include "../SimpleTranslator.tab.h"
+
+int snum;
 	extern void yyerror(char *);
 %}
 
